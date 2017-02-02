@@ -1,0 +1,20 @@
+contents:
+- title1: タイトル1
+  title2: タイトル2
+  title3: タイトル3
+  name: 講演者1
+  depart: A大学
+  file: sample1.pdf
+  hasTitle: False
+  twoup: False
+  range: range(pr.numPages)
+param:
+  outfile: out.pdf
+  header: Copyright 2017 日本オペレーションズ・リサーチ学会
+  titlepar:
+  - [48, 0, 216]
+  - [48, 0, 156]
+  - [48, 0, 96]
+  - [36, 10, 40]
+  - [24, 16, -6]
+  margin: 16
