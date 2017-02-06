@@ -38,7 +38,10 @@ for cnt in contents:
     pr = PdfReader(cnt['file'])
     if isinstance(cnt['range'], str):
         cnt['range'] = eval(cnt['range'])
-    nn += (len(cnt['range'])+numup*2-1)//(numup*2)*2
+    if cnt['toEven']:
+        nn += (len(cnt['range']) + numup*2-1) // (numup*2)*2
+    else:
+        nn += (len(cnt['range']) + numup-1) // (numup)
 for cnt in contents:
     numup = cnt['numup']
     if cnt['hasTitle']:
@@ -84,7 +87,7 @@ for cnt in contents:
             c.rect(0,0,pg.w,pg.h)
             c.restoreState()
         c.showPage()
-    if (len(pages)+numup-1)//numup%2:
+    if cnt['toEven'] and (len(pages)+numup-1)//numup%2:
         addpage()
         c.showPage()
 c.save()
