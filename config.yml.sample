@@ -1,20 +1,21 @@
 contents:
-- title1: タイトル1
-  title2: タイトル2
-  title3: タイトル3
-  name: 講演者1
-  depart: A大学
-  file: sample1.pdf
-  hasTitle: True
-  numup: 4
+- file: sample1.pdf
   range: range(pr.numPages)
+  numup: 4
+  hasTitle: True
+  titles: ["タイトル1", "タイトル2", "タイトル3", "講演者1", "A大学"]
+  toEven: True
+  flowToDown: False
 param:
-  outfile: out.pdf
+  outFile: out.pdf
+  margin: 16
+  fontFile: /usr/share/fonts/ipaexg.ttf
+  fontSize: 12
   header: Copyright 2017 日本オペレーションズ・リサーチ学会
-  titlepar:
+  footer: "- %d/%d -"
+  titleFontPos:
   - [48, 0, 216]
   - [48, 0, 156]
   - [48, 0, 96]
   - [36, 10, 40]
   - [24, 16, -6]
-  margin: 16
