@@ -5,8 +5,8 @@ contents:
   name: 講演者1
   depart: A大学
   file: sample1.pdf
-  hasTitle: False
-  twoup: False
+  hasTitle: True
+  numup: 4
   range: range(pr.numPages)
 param:
   outfile: out.pdf

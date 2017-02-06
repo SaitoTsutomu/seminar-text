@@ -7,7 +7,10 @@ from pdfrw import PdfReader
 from pdfrw.buildxobj import pagexobj
 from pdfrw.toreportlab import makerl
 from more_itertools import chunked
-pdfmetrics.registerFont(TTFont('IPAexGothic', '/usr/share/fonts/ipaexg.ttf'))
+try:
+    pdfmetrics.registerFont(TTFont('IPAexGothic', '/usr/share/fonts/ipaexg.ttf'))
+except:
+    pdfmetrics.registerFont(TTFont('IPAexGothic', 'C:/Windows/Fonts/ipaexg.ttf'))
 
 def addpage(np=[0]):
     np[0] += 1
@@ -28,15 +31,16 @@ w_, h_ = c._pagesize
 r_ = min(1 - 2*mgn/w_, 1 - 2*mgn/h_)
 w, h, nn = r_*w_, r_*h_, 0
 for cnt in contents:
-    tw = 2 if cnt['twoup'] else 4
+    numup = cnt['numup']
+    assert numup in [1,2,4]
     if cnt['hasTitle']:
         nn += 2
     pr = PdfReader(cnt['file'])
     if isinstance(cnt['range'], str):
         cnt['range'] = eval(cnt['range'])
-    nn += (len(cnt['range'])+tw*2-1)//(tw*2)*2
+    nn += (len(cnt['range'])+numup*2-1)//(numup*2)*2
 for cnt in contents:
-    tw = 2 if cnt['twoup'] else 4
+    numup = cnt['numup']
     if cnt['hasTitle']:
         addpage()
         c.translate(80, h/2-80)
@@ -48,25 +52,39 @@ for cnt in contents:
         c.showPage()
     pr = PdfReader(cnt['file'])
     pages = [pagexobj(pr.pages[i]) for i in cnt['range']]
-    for pgs in chunked(pages, tw):
+    for pgs in chunked(pages, numup):
         addpage()
         c.translate(w_/2-w/2, h_/2-h/2)
         for i, pg in enumerate(pgs):
-            r = min(w/pg.h, h/pg.w)/2 if tw == 4 else min(w/pg.w, h/pg.h/2)
+            pgw, pgh = pg.w, pg.h
+            islandscape = pgw >= pgh
+            if not islandscape:
+                pgw, pgh = pgh, pgw
+            r = [min(w/pgh,h/pgw), min(w/pgw,h/2/pgh), min(w/pgh,h/pgw)/2][numup//2]
             c.saveState()
-            if tw == 4:
-                c.translate((1+i//2)*w/2+(w/2-pg.h*r)/2, (i%2)*h/2+(h/2-pg.w*r)/2)
-            else:
-                c.translate((w-pg.w*r)/2, (1-i%2)*pg.h*r+(h-pg.h*r*2)/2)
-            if tw == 4:
-                c.rotate(90)
+            if numup == 1:
+                if islandscape:
+                    c.translate(pgh*r+(w-pgh*r)/2, (h-pgw*r)/2)
+                    c.rotate(90)
+            elif numup == 2:
+                if islandscape:
+                    c.translate((w-pgw*r)/2, (1-i%2)*pgh*r+(h-pgh*r*2)/2)
+                else:
+                    c.translate((w*3-pgw*r)/2, (1-i%2)*pgh*r+(h-pgh*r*2)/2)
+                    c.rotate(90)
+            elif numup == 4:
+                if islandscape:
+                    c.translate((1+i//2)*w/2+(w/2-pgh*r)/2, (i%2)*h/2+(h/2-pgw*r)/2)
+                    c.rotate(90)
+                else:
+                    c.translate((i%2)*w/2+(w/2-pgh*r)/2, (1-i//2)*h/2+(h/2-pgw*r)/2)
             c.scale(r, r)
             c.doForm(makerl(c, pg))
             c.setStrokeColor('gray')
             c.rect(0,0,pg.w,pg.h)
             c.restoreState()
         c.showPage()
-    if (len(pages)+tw-1)//tw%2:
+    if (len(pages)+numup-1)//numup%2:
         addpage()
         c.showPage()
 c.save()
