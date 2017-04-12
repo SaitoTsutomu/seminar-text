@@ -17,4 +17,4 @@ numup|Input pages per an output page
 hasTitle|Contents has a title page
 titles|List of string in a title page
 toEven|Make to even
-flowToDown|Page flow direction when 4 up
+flowToDown|Page flow direction
