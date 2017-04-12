@@ -15,7 +15,7 @@ def addHeaderFooter(np=[0]):
     if footer:
         c.setFillColor('black')
         c.drawCentredString(w_/2, mgn/2+2, footer%(np[0],len(cnts)))
-def addPage(c, w, h, numup, pg):
+def addPage(c, w, h, numup, i, pg):
     pgw, pgh = pg.w, pg.h
     islandscape = pgw >= pgh
     if not islandscape:
@@ -31,6 +31,12 @@ def addPage(c, w, h, numup, pg):
             c.translate((w-pgw*r)/2, (1-i%2)*pgh*r+(h-pgh*r*2)/2)
         else:
             c.translate((w*3-pgw*r)/2, (1-i%2)*pgh*r+(h-pgh*r*2)/2)
+            c.rotate(90)
+    elif numup == -2:
+        if islandscape:
+            c.translate((w-pgw*r)/2, (i%2)*pgh*r+(h-pgh*r*2)/2)
+        else:
+            c.translate((w*3-pgw*r)/2, (i%2)*pgh*r+(h-pgh*r*2)/2)
             c.rotate(90)
     elif numup == 4:
         if islandscape:
@@ -79,7 +85,7 @@ for cnt in contents:
     rng = cnt.get('range', 'range(pr.numPages)')
     if isinstance(rng, str):
         rng = eval(rng)
-    nm = numup if numup != 4 or not cnt.get('flowToDown', False) else -4
+    nm = numup if numup == 1 or not cnt.get('flowToDown', False) else -numup
     pages = [pagexobj(pr.pages[i]) for i in rng]
     for pgs in chunked(pages, numup):
         cnts.append((nm, pgs))
@@ -95,6 +101,6 @@ for numup, pgs in cnts:
     elif numup != 0:
         c.translate(w_/2-w/2, h_/2-h/2)
         for i, pg in enumerate(pgs):
-            addPage(c, w, h, numup, pg)
+            addPage(c, w, h, numup, i, pg)
     c.showPage()
 c.save()
