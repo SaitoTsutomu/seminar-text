@@ -1,5 +1,5 @@
 """Make OR Seminar text"""
-import yaml
+import sys, yaml
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -56,7 +56,7 @@ def addPage(c, w, h, numup, i, pg):
     c.rect(0,0,pg.w,pg.h)
     c.restoreState()
 
-with open('config.yml', encoding='utf8') as fp:
+with open(sys.argv[1] if len(sys.argv) > 1 else 'config.yml', encoding='utf8') as fp:
     config = yaml.load(fp)
 contents = config['contents']
 param = config['param']
