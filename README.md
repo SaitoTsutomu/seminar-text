@@ -18,3 +18,8 @@ hasTitle|Contents has a title page
 titles|List of string in a title page
 toEven|Make to even
 flowToDown|Page flow direction
+noHeader|No header
+noFooter|No footer
+noPageFeed|Don't feed page number
+isRaw|Don't calculate position
+transScale|[x,y,scale]
