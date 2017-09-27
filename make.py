@@ -16,7 +16,7 @@ def addHeaderFooter(option, numcnts, np=[0]):
     if footer and (option&O_NOFOOTER)==0:
         c.setFillColor('black')
         c.drawCentredString(w_/2, mgn/2+2, footer%(np[0],numcnts))
-def addPage(c, w, h, numup, i, pg, trsc):
+def addPage(c, w, h, numup, i, pg, trsc, nobnd):
     pgw, pgh = pg.w, pg.h
     islandscape = pgw >= pgh
     if not islandscape:
@@ -55,14 +55,16 @@ def addPage(c, w, h, numup, i, pg, trsc):
             c.translate((i//2)*w/2+(w/2-pgh*r)/2, (1-i%2)*h/2+(h/2-pgw*r)/2)
     c.scale(r, r)
     c.doForm(makerl(c, pg))
-    c.setStrokeColor('gray')
-    c.rect(0,0,pg.w,pg.h)
+    if not nobnd:
+        c.setStrokeColor('gray')
+        c.rect(0,0,pg.w,pg.h)
     c.restoreState()
 
 O_NOHEADER = 1
 O_NOFOOTER = 2
 O_NOPAGEFEED = 4
 O_ISRAW = 8
+O_NOBOUND = 16
 with open(sys.argv[1] if len(sys.argv) > 1 else 'config.yml', encoding='utf8') as fp:
     config = yaml.load(fp)
 contents = config['contents']
@@ -84,7 +86,8 @@ for cnt in contents:
     option = ((O_NOHEADER if cnt.get('noHeader', False) else 0)
              |(O_NOFOOTER if cnt.get('noFooter', False) else 0)
              |(O_NOPAGEFEED if cnt.get('noPageFeed', False) else 0)
-             |(O_ISRAW if cnt.get('isRaw', False) else 0))
+             |(O_ISRAW if cnt.get('isRaw', False) else 0)
+             |(O_NOBOUND if cnt.get('nobound', False) else 0))
     trsc = cnt.get('transScale', None)
     numup = cnt.get('numup', 1)
     assert numup in [1,2,4]
@@ -126,6 +129,6 @@ for numup, option, trsc, pgs in cnts:
     elif numup != 0:
         c.translate(w_/2-w/2, h_/2-h/2)
         for i, pg in enumerate(pgs):
-            addPage(c, w, h, numup, i, pg, trsc)
+            addPage(c, w, h, numup, i, pg, trsc, option&O_NOBOUND)
     c.showPage()
 c.save()
