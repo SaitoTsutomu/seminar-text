@@ -23,3 +23,4 @@ noFooter|No footer
 noPageFeed|Don't feed page number
 isRaw|Don't calculate position
 transScale|[x,y,scale]
+nobound|No boundary
